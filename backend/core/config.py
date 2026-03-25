@@ -7,10 +7,11 @@ import os
 
 load_dotenv()  # .env 파일을 읽어서 환경변수로 등록
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 PDF_PATH       = os.getenv("PDF_PATH", "document.pdf")
 CHUNK_SIZE     = int(os.getenv("CHUNK_SIZE", 500))
 CHUNK_OVERLAP  = int(os.getenv("CHUNK_OVERLAP", 50))
 TOP_K          = int(os.getenv("TOP_K", 3))
 EMBED_MODEL    = os.getenv("EMBED_MODEL", "text-embedding-3-small")
-CHAT_MODEL     = os.getenv("CHAT_MODEL", "gpt-4o-mini")
+LLM_MODEL     = os.getenv("LLM_MODEL")
+BASE_URL      = os.getenv("BASE_URL")

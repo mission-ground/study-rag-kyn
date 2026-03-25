@@ -21,13 +21,21 @@ embedder, vector_store, docstore, embeddings, child_contents = builder.build()
 
 pipeline = RAGPipeline(embedder, vector_store, docstore, embeddings, child_contents)
 
-answer = pipeline.ask("돈이 주는 가장 큰 배당금은 무엇인가?")
 
-print(answer)
-# 1주차 내용은 위에까지. 아래는 무시할 것.
+while True:
+    user_input = input("나 > ")
+   
+    if not user_input.strip():
+        continue
 
-
-
+    if user_input.lower() in ["exit", "quit"]:
+        print("종료합니다.")
+        break
+    try:
+        answer = pipeline.ask(user_input)
+        print("AI >", answer)
+    except Exception as e:
+        print("에러 발생:", e)
 
 
 

@@ -32,7 +32,7 @@ class VectorStore:
 
         results = []
 
-        for idx, dist in zip(indices[0], distances[0]):
+        for idx, dist in zip(indices[0], distances[0]): # 두 개 리스트를 짝지어서 묶어주는 함수
             if idx == -1: # 결과 없으면
                 continue
 
