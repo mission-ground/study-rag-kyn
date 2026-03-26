@@ -3,18 +3,13 @@
 # 전체 흐름 : PDFLoader → Chunker → Embedder → Retriever → Generator
 from backend.service.rag.ingestion.index_builder import IndexBuilder
 from backend.service.rag.rag_pipeline import RAGPipeline
+import gradio as gr
+import traceback
+
 
 #1. 데이터 로드 → 청킹 → 임베딩 → 벡터DB 저장 → 검색 → 답변 생성
 
-print("=" * 50)
-print("1주차 개발 : RAG 파이프라인 시작")
-print("=" * 50)
-# 1. 인덱스 생성
-# RAG에서 인덱스 생성 = 데이터를 검색 가능하게 준비하는 과정
-# 1.1 ├ PDF 읽기
-# 1.2 ├ Chunk 생성
-# 1.3 ├ Embedding 생성
-# 1.4 └ VectorDB 저장
+
 builder = IndexBuilder()
 
 embedder, vector_store, docstore, embeddings, child_contents = builder.build()
@@ -22,40 +17,28 @@ embedder, vector_store, docstore, embeddings, child_contents = builder.build()
 pipeline = RAGPipeline(embedder, vector_store, docstore, embeddings, child_contents)
 
 
-while True:
-    user_input = input("나 > ")
-   
-    if not user_input.strip():
-        continue
-
-    if user_input.lower() in ["exit", "quit"]:
-        print("종료합니다.")
-        break
+# Gradio용 함수
+def chat_fn(message, history):
     try:
-        answer = pipeline.ask(user_input)
-        print("AI >", answer)
+        answer = pipeline.ask(message)
     except Exception as e:
-        print("에러 발생:", e)
+        answer = f"에러 발생: {e}"
+        traceback.print_exc()
+
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": answer})
+    
+    return history, history
 
 
+# Gradio UI
+with gr.Blocks() as demo:
+    gr.Markdown("# RAG 챗봇")
 
+    chatbot = gr.Chatbot()
+    msg = gr.Textbox(placeholder="질문을 입력하세요!!")
 
+    msg.submit(chat_fn, [msg, chatbot], [chatbot, chatbot])
 
-
-
-# 2. RAG 파이프라인 생성
-# 2.1 ├ query
-# 2.2 ├ embedding
-# 2.3 ├ vector search
-# 2.4 ├ context 생성
-# 2.5 └ LLM 호출
-#rag = RAGPipeline(embedder, store)
-
-# 3. 질문 반복
-#while True:
-
-    #query = input("질문: ")
-
-    #answer = rag.ask(query)
-
-    #print("답변:", answer)
+# 실행
+demo.launch()
