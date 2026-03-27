@@ -3,6 +3,7 @@
 # 전체 흐름 : PDFLoader → Chunker → Embedder → Retriever → Generator
 from backend.service.rag.ingestion.index_builder import IndexBuilder
 from backend.service.rag.rag_pipeline import RAGPipeline
+# from backend.service.rag.index_manager import get_pipeline
 import gradio as gr
 import traceback
 
@@ -12,13 +13,17 @@ import traceback
 
 builder = IndexBuilder()
 
-embedder, vector_store, docstore, embeddings, child_contents = builder.build()
+data = builder.get_or_build()
 
-pipeline = RAGPipeline(embedder, vector_store, docstore, embeddings, child_contents)
+# embedder, vector_store, docstore, embeddings, child_contents = builder.build()
 
+pipeline = RAGPipeline(data["embedder"], data["vector_store"], data["docstore"], data["embeddings"], data["child_contents"])
+
+# todo 백그라운드 로딩
 
 # Gradio용 함수
 def chat_fn(message, history):
+
     try:
         answer = pipeline.ask(message)
     except Exception as e:
@@ -28,7 +33,7 @@ def chat_fn(message, history):
     history.append({"role": "user", "content": message})
     history.append({"role": "assistant", "content": answer})
     
-    return history, history
+    return history, history, ""  # ← 마지막이 입력창 초기화
 
 
 # Gradio UI
@@ -38,7 +43,7 @@ with gr.Blocks() as demo:
     chatbot = gr.Chatbot()
     msg = gr.Textbox(placeholder="질문을 입력하세요!!")
 
-    msg.submit(chat_fn, [msg, chatbot], [chatbot, chatbot])
+    msg.submit(chat_fn, [msg, chatbot], [chatbot, chatbot, msg])
 
 # 실행
 demo.launch()

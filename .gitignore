@@ -5,6 +5,8 @@ __pycache__
 .env
 .vscode
 
-backend/data/raw
 docstore.json
 *copy.py
+
+backend/data/raw/pdf/*
+backend/data/embeddings/faiss_index/*
