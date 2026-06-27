@@ -1,49 +1,17 @@
-from transformers import AutoTokenizer
 import uuid
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-import re
-import kss
-
 
 class Chunker:
 
     def __init__(
         self,
-        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        embedding_model,
         chunk_size=265,
         overlap=50
     ):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.embeding_model = SentenceTransformer(model_name)
+        self.embeding_model = embedding_model
         self.chunk_size = chunk_size
         self.overlap = overlap
-
-    def split(self, text): # 토큰 기준
-
-        tokens = self.tokenizer.encode(text)
-
-        chunks = []
-
-        start = 0
-
-        while start < len(tokens):
-
-            end = start + self.chunk_size
-
-            chunk_tokens = tokens[start:end]
-
-            chunk_text = self.tokenizer.decode(chunk_tokens)
-
-            chunks.append(chunk_text)
-
-            start += self.chunk_size - self.overlap
-
-        return chunks
-    
-
 
     def parent_child_split(
         self,
@@ -53,6 +21,7 @@ class Chunker:
         child_chunk_size=600,
         child_overlap=50
     ):
+        from langchain_text_splitters import RecursiveCharacterTextSplitter # lazyimport
 
         # Recursive : 문단 기준으로 자르고, 안되면 줄바꿈, 안되면 공백, 최후 → 글자 단위
         # parent_splitter = RecursiveCharacterTextSplitter(
@@ -155,9 +124,10 @@ class Chunker:
             chunks.append(" ".join(current_chunk))
 
 
-        # print(f"★전체 청크!!!!!!!!!!! {chunks}")
+        # print(f"★전체 청크! {chunks}")
         return chunks
     
 
     def split_sentences(self, text):
+        import kss # lazy import
         return kss.split_sentences(text) # kss = 한국어 문장 분리기.. 긴 텍스트 → 문장 리스트로 변환

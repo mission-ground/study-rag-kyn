@@ -60,7 +60,7 @@ class VectorStore:
 
     
     def save_local(self, path):
-
+        print("!! save_local이 실행되다!!")
         os.makedirs(path, exist_ok=True)
 
         # FAISS index
@@ -134,5 +134,5 @@ class VectorStore:
             json.dump(meta, f)
 
     # 허용 오차(epsilon)
-    def is_same_time(self, t1, t2, eps=0.01):  # 10ms 허용
+    def is_same_time(self, t1, t2, eps=0.1):  # 10ms 허용
         return abs(t1 - t2) < eps

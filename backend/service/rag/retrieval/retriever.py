@@ -9,8 +9,8 @@ class Retriever:
         self.embedder = embedder
         self.vector_store = vector_store
         self.docstore = docstore
-        self.embeddings = embeddings
-        self.child_contents = child_contents
+        # self.embeddings = embeddings
+        # self.child_contents = child_contents
 
 
     def retrieve(self, query, k=3, window_size=1):
