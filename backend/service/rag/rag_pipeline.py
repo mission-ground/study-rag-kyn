@@ -17,10 +17,12 @@ class RAGPipeline:
 
     def ask(self, query):
 
-        documents = self.retriever.retrieve(query)
-
+        # if self.generator.is_retrieval_query(query):
+        rewritten_query = self.generator.rewrite_query(query)
+        documents = self.retriever.retrieve(rewritten_query)
         context = "\n".join(documents)
 
-        answer = self.generator.generate(query, context)
+        # else:
+        #     context = None
 
-        return answer
+        return self.generator.generate(query, context)
